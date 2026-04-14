@@ -1,5 +1,6 @@
 import { getAllRecords } from "@/api";
 import Link from "next/link";
+import PurgeCacheButton from "./components/PurgeCacheButton";
 
 export default async function Home() {
   const records = await getAllRecords();
@@ -11,6 +12,10 @@ export default async function Home() {
           <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             No records yet
           </h1>
+
+          <div className="mt-6">
+            <PurgeCacheButton tag="records" />
+          </div>
         </main>
       </div>
     );
@@ -19,9 +24,15 @@ export default async function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-          Records
-        </h1>
+        <div className="flex w-full items-start justify-between gap-6">
+          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Records
+          </h1>
+
+          <div className="shrink-0">
+            <PurgeCacheButton tag="records" />
+          </div>
+        </div>
 
         <ul className="mt-6 w-full space-y-2">
           {records.map(({ id, data }) => {

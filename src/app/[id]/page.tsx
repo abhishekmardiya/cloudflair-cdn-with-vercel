@@ -1,6 +1,7 @@
 import { getRecordById } from "@/api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import PurgeCacheButton from "../components/PurgeCacheButton";
 
 // export async function generateStaticParams() {
 //   const records = await getAllRecords();
@@ -33,13 +34,19 @@ export default async function ProductPage({
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-center py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900 dark:focus-visible:ring-zinc-600 dark:focus-visible:ring-offset-black"
-        >
-          <span aria-hidden="true">←</span>
-          Back to home
-        </Link>
+        <div className="mb-6 flex w-full items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900 dark:focus-visible:ring-zinc-600 dark:focus-visible:ring-offset-black"
+          >
+            <span aria-hidden="true">←</span>
+            Back to home
+          </Link>
+
+          <div className="shrink-0">
+            <PurgeCacheButton tag={id} />
+          </div>
+        </div>
 
         <div className="flex w-full items-start justify-between gap-6">
           <div className="min-w-0">
