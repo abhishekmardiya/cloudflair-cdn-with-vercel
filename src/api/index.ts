@@ -14,8 +14,7 @@ const getRequestInit = (tag: string): RequestInit => {
   return {
     method: "GET",
     headers: {
-      "x-api-key":
-        "pro_2d117ba61fe76bb7eb3384f5e26935715926f05e7fc2f572f9974e11e210541b",
+      "x-api-key": process.env.REQ_RES_API_KEY ?? "",
       "X-Reqres-Env": "prod",
     },
     cache: "force-cache",
@@ -26,7 +25,7 @@ const getRequestInit = (tag: string): RequestInit => {
 export const getAllRecords = async (): Promise<Record[]> => {
   const res = await fetch(
     "https://reqres.in/api/collections/products/records?project_id=12257",
-    getRequestInit("records")
+    getRequestInit("records"),
   );
 
   if (!res.ok) {
@@ -45,7 +44,7 @@ export const getRecordById = async ({
 }): Promise<Record | null> => {
   const res = await fetch(
     `https://reqres.in/api/collections/products/records/${id}?project_id=12257`,
-    getRequestInit(id)
+    getRequestInit(id),
   );
 
   if (!res.ok) {

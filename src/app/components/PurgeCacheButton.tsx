@@ -1,23 +1,35 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 type PurgeCacheButtonProps = {
   tag: string;
 };
 
+const bodyAsText = (text: string): string => {
+  if (!text) {
+    return "(empty body)";
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(text);
+    return JSON.stringify(parsed, null, 2);
+  } catch {
+    return text;
+  }
+};
+
 export default function PurgeCacheButton({ tag }: PurgeCacheButtonProps) {
-  const [{ status, message }, setState] = useState<{
-    status: "idle" | "loading" | "success" | "error";
-    message: string | null;
-  }>({ status: "idle", message: null });
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleClick() {
-    if (status === "loading") {
+    if (isLoading) {
       return;
     }
 
-    setState({ status: "loading", message: null });
+    setIsLoading(true);
+    const toastId = toast.loading("Clearing cache…", { duration: Infinity });
 
     try {
       const response = await fetch(`/api/${encodeURIComponent(tag)}`, {
@@ -25,26 +37,29 @@ export default function PurgeCacheButton({ tag }: PurgeCacheButtonProps) {
         cache: "no-store",
       });
 
-      const data = (await response.json()) as { message?: string };
+      const text = await response.text();
+      const description = [
+        `${response.status} ${response.statusText}`,
+        "",
+        bodyAsText(text),
+      ].join("\n");
 
-      if (!response.ok) {
-        setState({
-          status: "error",
-          message: data.message ?? "Failed to purge cache",
-        });
+      toast.dismiss(toastId);
+
+      if (response.ok) {
+        toast.success("OK", { description });
         return;
       }
 
-      setState({
-        status: "success",
-        message: data.message ?? "Cache invalidated",
-      });
-    } catch {
-      setState({ status: "error", message: "Failed to purge cache" });
+      toast.error("Error", { description });
+    } catch (error: unknown) {
+      toast.dismiss(toastId);
+      const message = error instanceof Error ? error.message : String(error);
+      toast.error("Request failed", { description: message });
+    } finally {
+      setIsLoading(false);
     }
   }
-
-  const isLoading = status === "loading";
 
   return (
     <div className="flex items-center gap-3">
@@ -56,19 +71,6 @@ export default function PurgeCacheButton({ tag }: PurgeCacheButtonProps) {
       >
         {isLoading ? "Purging…" : "Purge cache"}
       </button>
-
-      {message ? (
-        <span
-          className={[
-            "text-xs font-medium",
-            status === "error"
-              ? "text-red-600 dark:text-red-400"
-              : "text-zinc-600 dark:text-zinc-400",
-          ].join(" ")}
-        >
-          {message}
-        </span>
-      ) : null}
     </div>
   );
 }
