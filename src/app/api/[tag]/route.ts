@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { headers } from "next/headers";
 
 // for index page
 // /api/records
@@ -137,13 +136,6 @@ export async function GET(
       },
       {
         status: 400,
-        headers: {
-          // This tells Cloudflare AND the browser to never cache this response
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
       }
     );
   }
@@ -202,13 +194,6 @@ export async function GET(
       },
       {
         status: worstStatus,
-        headers: {
-          // This tells Cloudflare AND the browser to never cache this response
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
       }
     );
   }
@@ -222,13 +207,6 @@ export async function GET(
     },
     {
       status: 200,
-      headers: {
-        // This tells Cloudflare AND the browser to never cache this response
-        "Cache-Control":
-          "no-store, no-cache, must-revalidate, proxy-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
     }
   );
 }
