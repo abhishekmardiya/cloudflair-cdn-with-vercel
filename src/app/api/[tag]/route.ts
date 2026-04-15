@@ -37,7 +37,7 @@ export type PurgeResult =
  * Strictly accepts a single string instead of an array.
  */
 export const purgeSingleUrl = async (
-  urlToPurge: string,
+  urlToPurge: string
 ): Promise<PurgeResult> => {
   const zoneId = process.env.CLOUDFLARE_ZONE_ID;
   const apiToken = process.env.CLOUDFLARE_API_TOKEN;
@@ -120,21 +120,28 @@ export async function GET(
     params,
   }: {
     params: Promise<{ tag: string }>;
-  },
+  }
 ) {
   const { tag } = await params;
 
   if (typeof tag !== "string" || !tag.trim()) {
     return NextResponse.json(
       {
+        tag,
+        purgedUrl: null,
         error: {
           code: "INVALID_TAG",
           message: "Route tag must be a non-empty string.",
         },
       },
-      { status: 400 },
+      { status: 400 }
     );
   }
+
+  const purgedUrl =
+    tag === "records"
+      ? "https://ts.asyncawaits.com"
+      : `https://ts.asyncawaits.com/${tag}`;
 
   const errors: Array<{ step: string; code: string; message: string }> = [];
   let worstStatus = 200;
@@ -161,7 +168,7 @@ export async function GET(
     bumpStatus(500);
   }
 
-  const purge = await purgeSingleUrl(`https://ts.asyncawaits.com/${tag}`);
+  const purge = await purgeSingleUrl(purgedUrl);
 
   if (!purge.ok) {
     errors.push({
@@ -175,21 +182,25 @@ export async function GET(
   if (errors.length > 0) {
     return NextResponse.json(
       {
+        tag,
+        purgedUrl,
         message: "One or more steps failed.",
         errors,
         ...(purge.ok === false && purge.cloudflareErrors
           ? { cloudflareErrors: purge.cloudflareErrors }
           : {}),
       },
-      { status: worstStatus },
+      { status: worstStatus }
     );
   }
 
   return NextResponse.json(
     {
+      tag,
+      purgedUrl,
       message: "Cache Invalidated",
       code: 1,
     },
-    { status: 200 },
+    { status: 200 }
   );
 }
